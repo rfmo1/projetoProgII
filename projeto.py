@@ -43,6 +43,19 @@ def limpa_converte(dados, lista_colunas, pred_filtragem, funs_converter):
     return list(convert)
 
 def converte_tempo(tempo):
+    """Converte uma string com o tempo no formato "Ano-Mês-Dia Horas:Minutos:Segundos" num dicionário
+    com essa informação
+
+    Args:
+        tempo (str): string onde se encontra a data e hora
+
+    Returns:
+        dict: Dicionário com o tempo
+
+    Pre:
+        A string tempo seja no formato indicado a cima
+    """
+
     li = tempo.split(" ")
     data = li[0].split("-")
     horas = li[1].split(":")
@@ -50,6 +63,16 @@ def converte_tempo(tempo):
         "dia": data[2], "mes": data[1], "ano": data[0]}
 
 def get_jogos_user(dados):
+    """Obtem um dicionário com o número de jogos que casa utilizador jogou
+
+    Args:
+        dados (list[dict]): lista com os dicionários da informação de cada jogo
+
+    Returns:
+        dict: dicionário em que as chaves são os nomes dos jogadores e os valores
+    o número de jogos jogado
+    """
+
     info = {}
     for dado in dados:
         if dado["black_username"].lower() in info.keys():
@@ -63,6 +86,18 @@ def get_jogos_user(dados):
     return info
 
 def tracar_anos(abcissas, jogos, jogadoras):
+    """Traça o gráfico necessário para o comando 'anos'
+
+    Args:
+        abcissas (list): lista de anos
+        jogos (list): lista de totais jogos jogados em cada ano
+        jogadoras (list): lista dos números de jogadoras diferentes que jogaram
+    em cada ano
+
+    Pre:
+        len(abcissas) == len(jogos) == len(jogadoras)
+    """
+
     fig, ax1 = plt.subplots()
     ax1.plot(abcissas, jogadoras, color="blue")
     ax1.set_ylabel("#Jogadoras diferentes")
@@ -75,6 +110,12 @@ def tracar_anos(abcissas, jogos, jogadoras):
     plt.show()
 
 def anos(dados):
+    """Trata do comando anos
+
+    Args:
+        dados (list[dict]): lista com um dicionário para cada jogo contendo a sua informação
+    """
+
     dados_c = limpa_converte(dados, ["end_time", "black_username", "white_username"], lambda jogo: True, [lambda tempo: int(converte_tempo(tempo)["ano"]), str, str])
     conjunto_anos = list(map(lambda jogo: jogo["end_time"], dados_c))
     abcissas = range(min(conjunto_anos), max(conjunto_anos) + 1)
@@ -84,6 +125,20 @@ def anos(dados):
     tracar_anos(abcissas, jogos, jogadoras)
 
 def tracar_vitorias(abcissas, white_wins, black_wins, width):
+    """Traça o gráfico necessário para o comando 'vitorias'
+
+    Args:
+        abcissas (list): lista de utilizadores
+        white_wins (list): lista das percentagens de vitorias jogando com as
+    brancas de cada jogador
+        black_wins (list): lista das percentagens de vitorias jogando com as
+    pretas de cada jogador
+        width (float): largura das barras
+
+    Pre:
+        len(abcissas) == len(white_wins) == len(black_wins)
+    """
+
     fig, ax1 = plt.subplots()
     X1 = range(len(abcissas))
     X2 = list(map(lambda x: x+width, X1))
@@ -96,6 +151,13 @@ def tracar_vitorias(abcissas, white_wins, black_wins, width):
     plt.show()
 
 def vitorias_U(dados, users):
+    """Trata do caso em que o comando 'vitorias' é chamado com a opção -u
+
+    Args:
+        dados (list[dict]): lista com um dicionário para cada jogo contendo a sua informação
+        users (list): lista com os nomes dos utilizadores que aparecerão no gráfico
+    """
+
     is_win = lambda result: result == "win"
     users_c = list(map(lambda user: user.lower(), users))
     dados_c = limpa_converte(dados, ["black_username", "black_result", "white_username", "white_result"], lambda jogo: jogo["white_username"].lower() in users_c or jogo["black_username"].lower() in users_c, [str, is_win, str, is_win])
@@ -104,6 +166,14 @@ def vitorias_U(dados, users):
     tracar_vitorias(users, white_wins, black_wins, 0.3)
 
 def vitorias_C(dados, count=5):
+    """Trata do caso em que o comando 'vitorias' é chamado com a opção -c ou sem opção.
+    Escolhe os utilizadores que jogaram um maior número de jogos.
+
+    Args:
+        dados (list[dict]): lista com um dicionário para cada jogo contendo a sua informação
+        count (int): número total de utilizadores a incluir no gráfico
+    """
+
     is_win = lambda result: result == "win"
     dados_c = limpa_converte(dados, ["black_username", "black_result", "white_username", "white_result"], lambda jogo: True, [str, is_win, str, is_win])
     jogos = get_jogos_user(dados_c)
@@ -113,6 +183,12 @@ def vitorias_C(dados, count=5):
     tracar_vitorias(abcissas, white_wins, black_wins, 0.3)
 
 def vitorias(dados, opcoes):
+    """Chama as funções certas para o comando 'vitorias' consoante as opções
+
+    Args:
+        dados (list[dict]): lista com um dicionário para cada jogo contendo a sua informação
+        opcoes (list): lista com todas as opções indicadas após o comando
+    """
     if opcoes == []:
         vitorias_C(dados)
     elif opcoes[0] == "-c":
@@ -127,14 +203,15 @@ def vitorias(dados, opcoes):
 
 
 
-
-
+#Argumentos
 ficheiro = sys.argv[1]
 comando = sys.argv[2]
 opcoes = sys.argv[3:]
 
+#Obter dicionário a partir do csv
 dados = ler_csv_dicionario_cabecalho(ficheiro)
 
+#Escolher o comando
 if comando == "anos":
     anos(dados)
 elif comando == "vitorias":

@@ -104,7 +104,7 @@ def tracar_anos(abcissas, jogos, jogadoras):
     ax1.set_xlabel("Ano")
     ax2 = ax1.twinx()
     ax2.bar(abcissas, jogos, color="green")
-    ax1.set_ylabel("#Jogos")
+    ax2.set_ylabel("#Jogos")
     fig.tight_layout()
     plt.title("Jogos e jogadoras por ano")
     plt.show()
@@ -200,6 +200,47 @@ def vitorias(dados, opcoes):
         sys.exit(1)
 
 
+def tracar_mate(abcissas, jogos_ganhos, jogos_ganhos_mate, percentagens, width, X1, X2):
+    """Traça o gráfico necessário para o comando 'mate'
+
+    Args:
+        abcissas (list): lista de utilizadores
+        jogos_ganhos (list): lista de número de jogos ganhos por utilizador
+        jogos_ganhos_mate (list): lista de número de jogos ganhos por xeque-mate por utilizador
+        percentagens (list): lista percentagens de jogos ganhos por xeque-mate por utilizador
+        width (float): largura das barras
+        X1 (list): lista das abcissas das primeiras barras
+        X2 (list): lista das abcissas das segundas barras
+
+    Pre:
+        len(abcissas) == len(percentagens) == len(jogos_ganhos) == len(jogos_ganhos_mate)
+    """
+
+    fig, ax1 = plt.subplots()
+    ax1.bar(X1, jogos_ganhos, width, color="blue", label="jogos ganhos")
+    ax1.bar(X2, jogos_ganhos_mate, width,  color="grey", label="jogos ganhos por xeque-mate")
+    ax1.set_xticks(X1)
+    ax1.set_xticklabels(abcissas)
+    ax1.set_ylabel("#Jogos")
+    ax1.legend(loc="lower left")
+    ax2 = ax1.twinx()
+    ax2.plot(X1, percentagens, color="red", label="percentagem de xeque-mate")
+    ax2.set_ylabel("Percentagem de xeque-mates", color="red")
+    ax2.legend(loc="upper right")
+    plt.title("Percentagem de xeque-mates, jogos ganhos e jogos ganhos por xeque-mate")
+    plt.show()
+
+
+def mate(dados, opcoes):
+    is_mate = lambda result: (result == "win", result == "checkmated")
+    dados_c = limpa_converte(dados, ["black_username", "black_result", "white_username", "white_result"], lambda jogo: True, [str, is_mate, str, is_mate])
+    count = 5 if opcoes == [] else int(opcoes[1])
+    jogos = get_jogos_user(dados_c)
+    abcissas = list(reversed(sorted(jogos, key = jogos.get)))[:count]
+    jogos_ganhos = list(map(lambda user: len(list(filter(lambda jogo: (jogo["white_username"].lower() == user and jogo["white_result"][0]) or (jogo["black_username"].lower() == user and jogo["black_result"][0]) , dados_c))), abcissas))
+    jogos_ganhos_mate = list(map(lambda user: len(list(filter(lambda jogo: (jogo["white_username"].lower() == user and jogo["black_result"][1]) or (jogo["black_username"].lower() == user and jogo["white_result"][1]) , dados_c))), abcissas))
+    percentagens = list(map(lambda index: jogos_ganhos_mate[index]/jogos_ganhos[index],range(len(abcissas))))
+    tracar_mate(abcissas, jogos_ganhos, jogos_ganhos_mate, percentagens, 0.3, range(len(abcissas)), list(map(lambda x: x+0.3, range(len(abcissas)))))
 
 
 
@@ -216,12 +257,13 @@ if comando == "anos":
     anos(dados)
 elif comando == "vitorias":
     vitorias(dados, opcoes)
+elif comando == "mate":
+    mate(dados, opcoes)
 '''elif comando == "classes":
     classes(dados)
 elif comando == "seguinte":
     seguinte(dados)
-elif comando == "mate":
-    mate(dados)
+
 elif comando == "extrair":
     extrair(dados)
 else:

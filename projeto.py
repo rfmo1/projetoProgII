@@ -268,6 +268,82 @@ def mate(dados, opcoes):
     tracar_mate(abcissas, jogos_ganhos, jogos_ganhos_mate, percentagens, 0.3, range(len(abcissas)), list(map(lambda x: x+0.3, range(len(abcissas)))))
 
 
+def classes(dados, opcoes):
+    """Chama as funções certas para o comando 'classes' consoante as opções
+
+    Args:
+        dados (list[dict]): lista com um dicionário para cada jogo contendo a sua informação
+        opcoes (list): lista com todas as opções indicadas após o comando
+    """
+
+    if opcoes == []:
+        classes_tratamento(dados)
+    elif opcoes[0] == '-c' and (opcoes[1]).isdigit():
+        classes_tratamento(dados, int(opcoes[1]))
+    else:
+        print("Erro: Insira opções válidas.")
+        sys.exit(1)
+
+def classes_tratamento(dados, bars = 5):
+    """Faz o tratamento dos dados, preparando-os para serem plotados
+
+    Args:
+        dados (list[dict]): lista com um dicionário para cada jogo contendo a sua informação
+        bars (int): nr de barras a aparecer no grafico de barras
+
+    """
+
+    dict_dados_c = limpa_converte(dados, ['time_control', 'time_class'],lambda cell: cell != None  ,[str,str])
+    formatos = { 'blitz':[], 'bullet':[], 'daily':[] ,'rapid':[]}
+    for dic in dict_dados_c:
+        for form in formatos:
+            if dic['time_class']==form:
+                formatos[form].append(dic['time_control'])
+    dict_classes = {form:sorted([(item, formatos[form].count(item)) for item in list(set(formatos[form]))], key=lambda x: x[1])[-bars:]
+                    for form in list(formatos.keys())}
+    Geral = [(item,len(formatos[item])) for item in list(formatos.keys())]
+    tracar_classes(dict_classes,Geral)
+
+def tracar_classes(L,Geral):
+    """Traça a imagem com os subplots
+
+    Args:
+        L (dict): dicionário com tuplos (formato_jogo, #jogos) para as modalidades do xadrez
+        Geral(list[tuples]): lista de tuplos(modalidade_jogo, #jogos_total)
+
+    """
+
+    ax1 = plt.subplot2grid((5,10), (0,0), colspan=2)
+    list1, list2 = zip(*L['rapid'])
+    ax1.bar(list1[::-1],list2[::-1])
+    ax1.set_title('rapid')
+    ax1.set(xlabel='Formato de Jogo', ylabel='#jogos')
+    plt.xticks(range(len(list1)), list1, rotation='vertical')
+    ax2 = plt.subplot2grid((5,10), (0,4), colspan=2)
+    list1, list2 = zip(*L['daily'])
+    ax2.set_title('daily')
+    ax2.set(xlabel='Formato de Jogo', ylabel='#jogos')
+    ax2.bar(list1[::-1],list2[::-1])
+    plt.xticks(range(len(list1)), list1, rotation='vertical')
+    ax3 = plt.subplot2grid((5,10), (0,8), colspan=2)
+    list1, list2 = zip(*L['bullet'])
+    ax3.set_title('bullet')
+    ax3.bar(list1[::-1],list2[::-1])
+    ax3.set(xlabel='Formato de Jogo', ylabel='#jogos')
+    plt.xticks(range(len(list1)), list1, rotation='vertical')
+    ax4 = plt.subplot2grid((5,10), (3,0), colspan=2)
+    list1, list2 = zip(*L['blitz'])
+    ax4.set_title('blitz')
+    ax4.bar(list1[::-1],list2[::-1])
+    ax4.set(xlabel='Formato de Jogo', ylabel='#jogos')
+    plt.xticks(range(len(list1)), list1, rotation='vertical')
+    ax5 = plt.subplot2grid((5,10), (3,4), colspan=2)
+    list1, list2 = zip(*Geral)
+    ax5.set_title('time_class')
+    ax5.set(xlabel='Formato de Jogo', ylabel='#jogos')
+    plt.xticks(range(len(list1)), list1, rotation='vertical')
+    ax5.bar(list1,list2)
+    plt.show()
 
 #Argumentos
 ficheiro = sys.argv[1]

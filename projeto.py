@@ -345,6 +345,85 @@ def tracar_classes(L,Geral):
     ax5.bar(list1,list2)
     plt.show()
 
+    
+def seguinte(dados,opcoes):
+    """Chama as funções certas para o comando 'classes' consoante as opções
+
+
+    Args:
+        dados: lista com um dicionário para cada jogo contendo a sua informação
+        opcoes: lista com todas as opções indicadas após o comando
+    """
+
+    if opcoes == []:
+        seguinte_tratamento(dados)
+    #elif (...):
+    else:
+        print("Erro: Insira opções válidas.")
+        sys.exit(1)
+
+
+def seguinte_tratamento(dados, firstplay = 'e4', top = 5):
+    """Faz o tratamento dos dados, preparando-os para depois serem plotados
+
+    Args:
+        dados: lista com um dicionário para cada jogo contendo a sua informação
+        top: # de top jogadas a apresentar
+        firstplay: jogada de abertura
+    """
+
+    dados_convertidos = limpa_converte(dados, ['pgn'], lambda cell: cell['pgn'] != '' , [str])
+    L = [[dic['pgn']] for dic in dados_convertidos]
+    newL = list(map(lambda x: [x[0].replace('{', '').replace('}', '')], L))
+    newLL = list(map(lambda x: [re.sub("[\(\[].*?[\)\]]", "", x[0] )], newL))
+    newLLL = list(map(lambda x: x[0].split(), newLL))
+    flt = list(filter(lambda x: x[0] == '1.', newLLL))
+    final = list(map(lambda a: a[1::2], flt))
+    filtrada = (list(filter(lambda x: x[0] == firstplay and len(x)> top, final)))
+    tracar_seguinte(filtrada, top,firstplay)
+
+def tracar_seguinte(filtrada,top,firstplay):
+    """Calcula as probabilidades e traca o respetivo gráfico de barras
+
+    Args:
+        filtrada: matriz com os dados filtrados prontos para serem usados nos calculos de probabilidades
+        top: # de top jogadas a apresentar
+        firstplay: jogada de abertura
+    """
+    seguinte = []
+    for item in filtrada:
+        seguinte.append(item[1])
+    aux = list(set(seguinte))
+    probabilidades = [(item,(seguinte.count(item)/len(seguinte)) )for item in aux]
+    probabilidades.sort(key=lambda x:x[1])
+
+
+    list1, list2 = zip(*probabilidades[-top:])
+    plt.bar(list1[::-1], list2[::-1])
+    plt.title('jogadas mais provaveis depois de {}'.format(firstplay))
+    plt.xlabel('jogadas')
+    plt.ylabel('probabilidade')
+    plt.show()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
 #Argumentos
 ficheiro = sys.argv[1]
 comando = sys.argv[2]
@@ -360,9 +439,9 @@ elif comando == "vitorias":
     vitorias(dados, opcoes)
 elif comando == "mate":
     mate(dados, opcoes)
-'''elif comando == "classes":
-    classes(dados)
-elif comando == "seguinte":
+elif comando == "classes":
+    classes(dados,opcoes)
+'''elif comando == "seguinte":
     seguinte(dados)
 
 elif comando == "extrair":

@@ -382,7 +382,7 @@ def seguinte(dados,opcoes):
         seguinte_tratamento(dados, firstplay, top)
     else:
         print("Erro: Insira opções válidas.")
-        sys.exit(1))
+        sys.exit(1)
 
 
 def seguinte_tratamento(dados, firstplay = 'e4', top = 5):

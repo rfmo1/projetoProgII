@@ -357,7 +357,16 @@ def seguinte(dados,opcoes):
 
     if opcoes == []:
         seguinte_tratamento(dados)
-    #elif (...):
+    elif '-j' in opcoes and '-c' in opcoes:
+        firstplay = opcoes[(opcoes.index('-j')+1)]
+        top = int(opcoes[(opcoes.index('-c') + 1)])
+        seguinte_tratamento(dados, firstplay, top)
+    elif '-j' == [0]:
+        firstplay = opcoes[1]
+        seguinte_tratamento(dados, firstplay)
+    elif '-c' == [0]:
+        top = int(opcoes[1])
+        seguinte_tratamento(dados,'e4',top)
     else:
         print("Erro: Insira opções válidas.")
         sys.exit(1)

@@ -1,7 +1,9 @@
 __author__ = Rafael Oliveira, 52848; Ariana Dias, 53687
 
+
 import csv, functools, math, sys, re
 import matplotlib.pyplot as plt
+
 
 def ler_csv_dicionario_cabecalho (nome_ficheiro, deli = None):
     """Ler um ficheiro CSV com cabeçalho.
@@ -44,6 +46,7 @@ def limpa_converte(dados, lista_colunas, pred_filtragem, funs_converter):
 
     return list(convert)
 
+
 def converte_tempo(tempo):
     """Converte uma string com o tempo no formato "Ano-Mês-Dia Horas:Minutos:Segundos" num dicionário
     com essa informação
@@ -63,6 +66,7 @@ def converte_tempo(tempo):
     horas = li[1].split(":")
     return {"segundos": horas[2], "minutos": horas[1], "horas": horas[0],
         "dia": data[2], "mes": data[1], "ano": data[0]}
+
 
 def get_jogos_user(dados):
     """Obtem um dicionário com o número de jogos que casa utilizador jogou
@@ -86,6 +90,7 @@ def get_jogos_user(dados):
         else:
             info[dado["white_username"].lower()] = 1
     return info
+
 
 def tracar_anos(abcissas, jogos, jogadoras):
     """Traça o gráfico necessário para o comando 'anos'
@@ -111,6 +116,7 @@ def tracar_anos(abcissas, jogos, jogadoras):
     plt.title("Jogos e jogadoras por ano")
     plt.show()
 
+    
 def anos(dados):
     """Trata do comando anos
 
@@ -126,6 +132,7 @@ def anos(dados):
     jogadoras = list(map(lambda ano: len(list(get_jogos_user(filtrar_ano(ano)).keys())), abcissas))
     tracar_anos(abcissas, jogos, jogadoras)
 
+    
 def tracar_vitorias(abcissas, white_wins, black_wins, width):
     """Traça o gráfico necessário para o comando 'vitorias'
 
@@ -152,6 +159,7 @@ def tracar_vitorias(abcissas, white_wins, black_wins, width):
     plt.title("Percentagem de vitórias jogando com peças brancas / pretas")
     plt.show()
 
+    
 def vitorias_U(dados, users):
     """Trata do caso em que o comando 'vitorias' é chamado com a opção -u
 
@@ -167,6 +175,7 @@ def vitorias_U(dados, users):
     black_wins = list(map(lambda user: len(list(filter(lambda jogo: jogo["black_username"].lower() == user and jogo["black_result"], dados_c)))/len(list(filter(lambda jogo: jogo["black_username"].lower() == user, dados_c))), users_c))
     tracar_vitorias(users, white_wins, black_wins, 0.3)
 
+    
 def vitorias_C(dados, count=5):
     """Trata do caso em que o comando 'vitorias' é chamado com a opção -c ou sem opção.
     Escolhe os utilizadores que jogaram um maior número de jogos.
@@ -184,6 +193,7 @@ def vitorias_C(dados, count=5):
     black_wins = list(map(lambda user: len(list(filter(lambda jogo: jogo["black_username"].lower() == user and jogo["black_result"], dados_c)))/len(list(filter(lambda jogo: jogo["black_username"].lower() == user, dados_c))), abcissas))
     tracar_vitorias(abcissas, white_wins, black_wins, 0.3)
 
+    
 def vitorias(dados, opcoes):
     """Chama as funções certas para o comando 'vitorias' consoante as opções
 
@@ -229,6 +239,7 @@ def tracar_eixos_mate(abcissas, jogos_ganhos, jogos_ganhos_mate, percentagens, w
     ax2.set_ylabel("Percentagem de xeque-mates", color="red")
     ax2.legend(loc="upper right")
 
+    
 def tracar_mate(abcissas, jogos_ganhos, jogos_ganhos_mate, percentagens, width, X1, X2):
     """Traça o gráfico necessário para o comando 'mate'
 
@@ -286,6 +297,7 @@ def classes(dados, opcoes):
         print("Erro: Insira opções válidas.")
         sys.exit(1)
 
+        
 def classes_tratamento(dados, bars = 5):
     """Faz o tratamento dos dados, preparando-os para serem plotados
 
@@ -306,6 +318,7 @@ def classes_tratamento(dados, bars = 5):
     Geral = [(item,len(formatos[item])) for item in list(formatos.keys())]
     tracar_classes(dict_classes,Geral)
 
+    
 def tracar_classes(L,Geral):
     """Traça a imagem com os subplots
 
@@ -391,6 +404,7 @@ def seguinte_tratamento(dados, firstplay = 'e4', top = 5):
     filtrada = (list(filter(lambda x: x[0] == firstplay and len(x)> top, final)))
     tracar_seguinte(filtrada, top,firstplay)
 
+    
 def tracar_seguinte(filtrada,top,firstplay):
     """Calcula as probabilidades e traca o respetivo gráfico de barras
 
@@ -463,22 +477,7 @@ def extrair_tratamento(dados, nome_ficheiro, pattern, coluna_testada):
         write.writeheader()
         for data in rows:
             write.writerow(data)    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+       
     
 #Argumentos
 ficheiro = sys.argv[1]

@@ -373,7 +373,7 @@ def seguinte(dados,opcoes):
     top = 5
 
     if opcoes == []:
-        seguinte_tratamento(dados)
+        seguinte_tratamento(dados, firstplay, top)
     elif '-j' in opcoes or '-c' in opcoes :
         if '-o' in opcoes:
             firstplay = opcoes[(opcoes.index('-j') + 1)]
@@ -441,7 +441,7 @@ def extrair(dados, opcoes):
     coluna_testada = 'wgm_username'
 
     if opcoes == []:
-        extrair_tratamento(dados)
+        extrair_tratamento(dados, nome_ficheiro, linhas_de_interesse, coluna_testada)
     elif '-o' in opcoes or '-r' in opcoes or '-d' in opcoes:
         if '-o' in opcoes:
             nome_ficheiro = opcoes[(opcoes.index('-o') + 1)]

@@ -1,4 +1,6 @@
-import csv, functools, math, sys
+__author__ = Rafael Oliveira, 52848; Ariana Dias, 53687
+
+import csv, functools, math, sys, re
 import matplotlib.pyplot as plt
 
 def ler_csv_dicionario_cabecalho (nome_ficheiro, deli = None):
@@ -349,27 +351,25 @@ def tracar_classes(L,Geral):
 def seguinte(dados,opcoes):
     """Chama as funções certas para o comando 'classes' consoante as opções
 
-
     Args:
         dados: lista com um dicionário para cada jogo contendo a sua informação
         opcoes: lista com todas as opções indicadas após o comando
     """
 
+    firstplay = 'e4'
+    top = 5
+
     if opcoes == []:
         seguinte_tratamento(dados)
-    elif '-j' in opcoes and '-c' in opcoes:
-        firstplay = opcoes[(opcoes.index('-j')+1)]
-        top = int(opcoes[(opcoes.index('-c') + 1)])
+    elif '-j' in opcoes or '-c' in opcoes :
+        if '-o' in opcoes:
+            firstplay = opcoes[(opcoes.index('-j') + 1)]
+        if '-r' in opcoes:
+            top = int(opcoes[(opcoes.index('-c') + 1)])
         seguinte_tratamento(dados, firstplay, top)
-    elif '-j' == [0]:
-        firstplay = opcoes[1]
-        seguinte_tratamento(dados, firstplay)
-    elif '-c' == [0]:
-        top = int(opcoes[1])
-        seguinte_tratamento(dados,'e4',top)
     else:
         print("Erro: Insira opções válidas.")
-        sys.exit(1)
+        sys.exit(1))
 
 
 def seguinte_tratamento(dados, firstplay = 'e4', top = 5):
@@ -415,7 +415,54 @@ def tracar_seguinte(filtrada,top,firstplay):
     plt.show()
     
     
+def extrair(dados, opcoes):
+    """Chama as funções certas para o comando 'classes' consoante as opções
+
+    Args:
+        dados: lista com um dicionário para cada jogo contendo a sua informação
+        opcoes: lista com todas as opções indicadas após o comando
+    """
+    nome_ficheiro = 'out.csv'
+    linhas_de_interesse = '.*'
+    coluna_testada = 'wgm_username'
+
+    if opcoes == []:
+        extrair_tratamento(dados)
+    elif '-o' in opcoes or '-r' in opcoes or '-d' in opcoes:
+        if '-o' in opcoes:
+            nome_ficheiro = opcoes[(opcoes.index('-o') + 1)]
+        if '-r' in opcoes:
+            linhas_de_interesse = opcoes[(opcoes.index('-r') + 1)]
+        if '-d' in opcoes:
+            coluna_testada = opcoes[(opcoes.index('-d'))]
+        extrair_tratamento(dados, nome_ficheiro, linhas_de_interesse, coluna_testada)
+    else:
+        print("Erro: Insira opções válidas.")
+        sys.exit(1)
+
+
+def extrair_tratamento(dados, nome_ficheiro, pattern, coluna_testada):
+    """Extrai informacao do ficheiro original para um outro ficheiro csv
+
+    Args:
+        dados: lista com um dicionário para cada jogo contendo a sua informação
+        nome_ficheiro: nome do ficheiro final
+        pattern: expressao regular que identifica as linhas de interesse
+        coluna_testada: nome da coluna onde a expressão regular é testada
+    """
     
+    header = list(dados[0].keys())
+    dados_2 = limpa_converte(dados, header, lambda x: x[coluna_testada], [str] * len(header))
+    rows = []
+    for dic in dados_2:
+        if re.match(pattern, dic[coluna_testada]):
+            rows.append(dic)
+
+    with open(nome_ficheiro, 'w', newline='') as f:
+        write = csv.DictWriter(f, fieldnames = header)
+        write.writeheader()
+        for data in rows:
+            write.writerow(data)    
     
     
     
@@ -450,11 +497,10 @@ elif comando == "mate":
     mate(dados, opcoes)
 elif comando == "classes":
     classes(dados,opcoes)
-'''elif comando == "seguinte":
-    seguinte(dados)
-
+elif comando == "seguinte":
+    seguinte(dados, opcoes)
 elif comando == "extrair":
-    extrair(dados)
+    extrair(dados, opcoes)
 else:
     print("Erro: Insira um comando válido.")
-    sys.exit(1)'''
+    sys.exit(1)

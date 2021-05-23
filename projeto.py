@@ -154,7 +154,7 @@ def tracar_vitorias(abcissas, white_wins, black_wins, width):
     ax1.bar(X1, white_wins, width, color="grey")
     ax1.set_ylabel("Percentagem de vitórias")
     ax1.bar(X2, black_wins, width,  color="black")
-    ax1.set_xticks(X1)
+    ax1.set_xticks(X1, rotation="vertical")
     ax1.set_xticklabels(abcissas)
     plt.title("Percentagem de vitórias jogando com peças brancas / pretas")
     plt.show()
@@ -230,7 +230,7 @@ def tracar_eixos_mate(abcissas, jogos_ganhos, jogos_ganhos_mate, percentagens, w
 
     ax1.bar(X1, jogos_ganhos, width, color="blue", label="jogos ganhos")
     ax1.bar(X2, jogos_ganhos_mate, width,  color="grey", label="jogos ganhos por xeque-mate")
-    ax1.set_xticks(X1)
+    ax1.set_xticks(X1, rotation="vertical")
     ax1.set_xticklabels(abcissas)
     ax1.set_ylabel("#Jogos")
     ax1.legend(loc="lower left")
